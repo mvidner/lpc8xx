@@ -1,82 +1,14 @@
 
 #include "lcd3310.h"
 #include "LPC8xx.h"    /* LPC8xx Peripheral Registers */
-/*
-SPI OUT je Pin 1
-SPI IN je Pin 7
-SPI Clock je Pin 6
-CS pro LCD je Pin 9
-D/C pro LCD je Pin 10
-Reset pro LCD je Pin 8
-*/
 
-/*
-#define sclk LATAbits.LA7 spi clk
-#define sdta LATAbits.LA4 spi out
-#define dorc LATAbits.LA3 data or cmd
-#define enab LATAbits.LA2 chip sel
-#define rset LATAbits.LA1 rset
-*/
+// to be provided from outside
 
-#define SCLK_GPIO LPC_GPIO1
-#define SCLK_pin 1
-#define SCLK (1<<SCLK_pin)
-#define SCLK_gma gpio_masked_access_t GPIO_MASKED_ACCESS(SCLK_GPIO, SCLK_pin)
-
-#define SDTA_GPIO LPC_GPIO1
-#define SDTA_pin 2
-#define SDTA (1<<SDTA_pin)
-#define SDTA_gma gpio_masked_access_t GPIO_MASKED_ACCESS(SDTA_GPIO, SDTA_pin)
-
-#define DORC_GPIO LPC_GPIO1
-#define DORC_pin 3
-#define DORC (1<<DORC_pin)
-#define DORC_gma gpio_masked_access_t GPIO_MASKED_ACCESS(DORC_GPIO, DORC_pin)
-
-#define ENAB_GPIO LPC_GPIO1
-#define ENAB_pin 4
-#define ENAB (1<<ENAB_pin)
-#define ENAB_gma gpio_masked_access_t GPIO_MASKED_ACCESS(ENAB_GPIO, ENAB_pin)
-
-#define RSET_GPIO LPC_GPIO1
-#define RSET_pin 5
-#define RSET (1<<RSET_pin)
-#define RSET_gma gpio_masked_access_t GPIO_MASKED_ACCESS(RSET_GPIO, RSET_pin)
-
-void lcd_pin_clock(int value) {
-  if (value)
-    SCLK_gma = SCLK;
-  else
-    SCLK_gma = 0;
-}
-
-void lcd_pin_data(int value) {
-  if (value)
-    SDTA_gma = SDTA;
-  else
-    SDTA_gma = 0;
-}
-
-void lcd_pin_datanotcmd(int value) {
-  if (value)
-    DORC_gma = DORC;
-  else
-    DORC_gma = 0;
-}
-
-void lcd_pin_enab(int value) {
-  if (value)
-    ENAB_gma = ENAB;
-  else
-    ENAB_gma = 0;
-}
-
-void lcd_pin_reset(int value) {
-  if (value)
-    RSET_gma = RSET;
-  else
-    RSET_gma = 0;
-}
+void lcd_pin_clock(int value);
+void lcd_pin_data(int value);
+void lcd_pin_datanotcmd(int value);
+void lcd_pin_enab(int value);
+void lcd_pin_reset(int value);
 
 const uint8_t font[768]={
     0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x5F,0x5F,0x00,0x00,0x00,
