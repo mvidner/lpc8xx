@@ -8,11 +8,7 @@
 #ifndef LCD3310_H
 #define	LCD3310_H
 
-// #include <xc.h>
 #include <stdint.h>        /* For uint8_t definition */
-
-#include "inc/LPC11xx.h"
-#include "hdr/hdr_gpio_masked_access.h"
 
 #ifdef	__cplusplus
 extern "C" {
