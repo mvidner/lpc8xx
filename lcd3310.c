@@ -1,12 +1,21 @@
 
 #include "lcd3310.h"
+#include "LPC8xx.h"    /* LPC8xx Peripheral Registers */
+/*
+SPI OUT je Pin 1
+SPI IN je Pin 7
+SPI Clock je Pin 6
+CS pro LCD je Pin 9
+D/C pro LCD je Pin 10
+Reset pro LCD je Pin 8
+*/
 
 /*
-#define sclk LATAbits.LA7
-#define sdta LATAbits.LA4
-#define dorc LATAbits.LA3
-#define enab LATAbits.LA2
-#define rset LATAbits.LA1
+#define sclk LATAbits.LA7 spi clk
+#define sdta LATAbits.LA4 spi out
+#define dorc LATAbits.LA3 data or cmd
+#define enab LATAbits.LA2 chip sel
+#define rset LATAbits.LA1 rset
 */
 
 #define SCLK_GPIO LPC_GPIO1
@@ -33,6 +42,41 @@
 #define RSET_pin 5
 #define RSET (1<<RSET_pin)
 #define RSET_gma gpio_masked_access_t GPIO_MASKED_ACCESS(RSET_GPIO, RSET_pin)
+
+void lcd_pin_clock(int value) {
+  if (value)
+    SCLK_gma = SCLK;
+  else
+    SCLK_gma = 0;
+}
+
+void lcd_pin_data(int value) {
+  if (value)
+    SDTA_gma = SDTA;
+  else
+    SDTA_gma = 0;
+}
+
+void lcd_pin_datanotcmd(int value) {
+  if (value)
+    DORC_gma = DORC;
+  else
+    DORC_gma = 0;
+}
+
+void lcd_pin_enab(int value) {
+  if (value)
+    ENAB_gma = ENAB;
+  else
+    ENAB_gma = 0;
+}
+
+void lcd_pin_reset(int value) {
+  if (value)
+    RSET_gma = RSET;
+  else
+    RSET_gma = 0;
+}
 
 const uint8_t font[768]={
     0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x5F,0x5F,0x00,0x00,0x00,
@@ -95,39 +139,39 @@ void lcd_w(uint8_t w) {
     uint8_t tmp=w;
     uint8_t i;
     for (i=0;i<8;i++) {
-        SCLK_gma=0; //sclk=0;
+	lcd_pin_clock(0);
         if (tmp>127) {
-            SDTA_gma=SDTA;// sdta=1;
+	    lcd_pin_data(1);
             tmp-=128;
         } else {
-	    SDTA_gma=0; //sdta=0;
-	}	
-        SCLK_gma=SCLK;//sclk=1;
+	    lcd_pin_data(0);
+	}
+	lcd_pin_clock(1);
         tmp=tmp<<1;
     }
 }
 
 //-----write lcd command
 void lcd_c(uint8_t c) {
-    DORC_gma=0; //dorc=0;
-    ENAB_gma=0; //enab=0;
+    lcd_pin_datanotcmd(0);
+    lcd_pin_enab(0);
     lcd_w(c);
-    ENAB_gma=ENAB; //enab=1;
+    lcd_pin_enab(1);
 }
 
 //-----write lcd data
 void lcd_d(uint8_t d) {
-    DORC_gma=DORC; //dorc=1;
-    ENAB_gma=0; //enab=0;
+    lcd_pin_datanotcmd(1);
+    lcd_pin_enab(0);
     lcd_w(d);
-    ENAB_gma=ENAB; //enab=1;
+    lcd_pin_enab(1);
 }
 
 //-----reset lcd
 void lcd_r(void) {
-    RSET_gma=0;//rset=0;
+    lcd_pin_reset(0);
     lcd_p();
-    RSET_gma=RSET;//rset=1;
+    lcd_pin_reset(1);
 }
 
 //------clean lcd
@@ -143,8 +187,8 @@ void lcd_clr(void) {
 //-------lcd init
 void lcd_init(void) {
     lcd_p();
-    DORC_gma=DORC; //dorc=1;
-    ENAB_gma=ENAB; //enab=1;
+    lcd_pin_datanotcmd(1);
+    lcd_pin_enab(1);
     lcd_r();
     lcd_c(0x21);
     lcd_c(0xC5); //197 //Voop
