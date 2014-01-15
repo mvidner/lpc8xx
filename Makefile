@@ -1,7 +1,8 @@
+PATH:=$(HOME)/gcc-arm/bin:$(PATH)
 OPTIMIZATION = s
 
 # lpc810 / lpc811 / lpc812
-MCU=lpc811
+MCU=lpc812
 
 #########################################################################
 PROJECT=template
