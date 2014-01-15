@@ -3,7 +3,7 @@ import serial
 import array
 
 #=========================================================
-PORT = '/dev/cu.usbserial-A100DEF4'
+PORT = '/dev/ttyUSB0'
 FILE = 'firmware.bin'
 
 RAM_ADDR    = 0x10000300
