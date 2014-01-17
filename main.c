@@ -1,6 +1,8 @@
 #include "main.h"
 #include "lcd3310.h"
 
+#define LED1 14
+
 /*
  * 	datasheet: http://www.nxp.com/documents/data_sheet/LPC81XM.pdf
  *  user manual: http://www.nxp.com/documents/user_manual/UM10601.pdf
@@ -57,8 +59,6 @@ void lcd_pin_enab(int value) {
 void lcd_pin_reset(int value) {
     lcd_pin_generic(value, 1<<11);
 }
-
-#define LED1 14
 
 extern void SwitchMatrix_Init(void);
 
