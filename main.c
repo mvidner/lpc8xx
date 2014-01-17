@@ -33,31 +33,35 @@ D/C pro LCD   je Pin 10 PIO0_16                 PIO0_16
 Reset pro LCD je Pin 8  PIO0_11(Open Drain)     PIO0_11   
 */
 
-void lcd_pin_generic(int value, uint32_t mask) {
+void gpio_pin(int value, uint32_t mask) {
     if (value)
 	LPC_GPIO_PORT->SET0 = mask;
     else
 	LPC_GPIO_PORT->CLR0 = mask;
 }
 
+void led(int value) {
+    gpio_pin(value, 1<<LED1);
+}
+
 void lcd_pin_clock(int value) {
-    lcd_pin_generic(value, 1<<3);
+    gpio_pin(value, 1<<3);
 }
 
 void lcd_pin_data(int value) {
-    lcd_pin_generic(value, 1<<17);
+    gpio_pin(value, 1<<17);
 }
 
 void lcd_pin_datanotcmd(int value) {
-    lcd_pin_generic(value, 1<<16);
+    gpio_pin(value, 1<<16);
 }
 
 void lcd_pin_enab(int value) {
-    lcd_pin_generic(value, 1<<10);
+    gpio_pin(value, 1<<10);
 }
 
 void lcd_pin_reset(int value) {
-    lcd_pin_generic(value, 1<<11);
+    gpio_pin(value, 1<<11);
 }
 
 extern void SwitchMatrix_Init(void);
@@ -78,9 +82,9 @@ int main(void ) {
         lcd_wbyte(42);
 	while (1)
 	{
-		LPC_GPIO_PORT->SET0 = 1<<LED1;    // LED1 output high
+                led(1);
 		delay_ms(1000);
-		LPC_GPIO_PORT->CLR0 = 1<<LED1;    // LED1 output low
+                led(0);
 		delay_ms(1000);
 	}
 
