@@ -38,12 +38,16 @@ void SwitchMatrix_Init()
     /* Enable SWM clock */
     LPC_SYSCON->SYSAHBCLKCTRL |= (1<<7);
 
-    /* Pin Assign 8 bit Configuration */
-    /* SPI0_SCK */
-    LPC_SWM->PINASSIGN3 = 0x03ffffffUL; 
-    /* SPI0_MOSI */
-    /* SPI0_MISO */
-    LPC_SWM->PINASSIGN4 = 0xffff0211UL; 
+    const int want_spi = 0;
+    if (want_spi)
+    {
+      /* Pin Assign 8 bit Configuration */
+      /* SPI0_SCK */
+      LPC_SWM->PINASSIGN3 = 0x03ffffffUL; 
+      /* SPI0_MOSI */
+      /* SPI0_MISO */
+      LPC_SWM->PINASSIGN4 = 0xffff0211UL;
+    }
 
     /* Pin Assign 1 bit Configuration */
     LPC_SWM->PINENABLE0 = 0xffffffffUL; 
