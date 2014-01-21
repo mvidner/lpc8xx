@@ -10,6 +10,8 @@ void lcd_pin_datanotcmd(int value);
 void lcd_pin_enab(int value);
 void lcd_pin_reset(int value);
 
+void delay_ms(uint32_t ms);
+
 const uint8_t font[768]={
     0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x5F,0x5F,0x00,0x00,0x00,
     0x00,0x03,0x03,0x00,0x03,0x03,0x00,0x00,0x14,0x7F,0x7F,0x14,0x7F,0x7F,0x14,0x00,
@@ -62,8 +64,9 @@ const uint8_t font[768]={
 
 //------pause for the lcd operations
 void lcd_p(void) {
-    volatile int i,j;
-    for (i=0;i<1000;i++) j=i+i;
+    //    volatile int i,j;
+    //    for (i=0;i<1000;i++) j=i+i;
+    delay_ms(500);
 }
 
 //-----write byte via "simulated" SPI
