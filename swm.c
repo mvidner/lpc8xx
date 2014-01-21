@@ -33,7 +33,7 @@
 #include "LPC8xx.h"    /* LPC8xx Peripheral Registers */
 #include "type.h"
 
-void SwitchMatrix_Init() 
+void SwitchMatrix_Init(void)
 { 
     /* Enable SWM clock */
     LPC_SYSCON->SYSAHBCLKCTRL |= (1<<7);
