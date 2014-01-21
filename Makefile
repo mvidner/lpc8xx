@@ -47,7 +47,7 @@ firmware.bin: .bin/$(PROJECT).elf Makefile
 	@$(OBJCOPY) -R .stack -O binary .bin/$(PROJECT).elf firmware.bin
 
 .bin/$(PROJECT).elf: $(OBJECTS) Makefile
-	@echo "  \033[1;34mLD \033[0m (\033[1;33m$(OBJECTS)\033[0m) -> $(PROJECT).elf"
+	@echo -e "  \033[1;34mLD \033[0m (\033[1;33m$(OBJECTS)\033[0m) -> $(PROJECT).elf"
 	@$(GCC) -o .bin/$(PROJECT).elf $(OBJECTS) $(GCFLAGS) $(LDFLAGS) 
 
 stats: .bin/$(PROJECT).elf 
@@ -68,7 +68,7 @@ clean:
 #########################################################################
 
 .bin/%.o: %.c Makefile 
-	@echo "  \033[1;34mGCC\033[0m $<"
+	@echo -e "  \033[1;34mGCC\033[0m $<"
 	@$(GCC) $(GCFLAGS) -o $@ -c $<
 	@$(GCC) $(GCFLAGS) -MM $< > $*.d.tmp
 	@sed -e 's|.*:|.bin/$*.o:|' < $*.d.tmp > .bin/$*.d
