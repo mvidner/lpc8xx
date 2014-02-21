@@ -9,25 +9,32 @@ PROJECT=template
 LDSCRIPT=core/$(MCU).ld
 
 
-SRC=$(wildcard core/*.c) $(wildcard *.c) 
+SRC=$(wildcard core/*.c) $(wildcard *.c *.cpp) $(wildcard adafruit/*.c adafruit/*.cpp)
+CSRC=$(patsubst %.cpp,%.c,$(SRC))
+$(info $(CSRC))
 
-OBJECTS=$(patsubst %,.bin/%,$(SRC:.c=.o))
-DEPS=$(patsubst %,.bin/%,$(SRC:.c=.d))
-LSTFILES=$(patsubst %,.bin/%,$(SRC:.c=.lst))
+OBJECTS=$(patsubst %,.bin/%,$(CSRC:.c=.o))
+DEPS=$(patsubst %,.bin/%,$(CSRC:.c=.d))
+LSTFILES=$(patsubst %,.bin/%,$(CSRC:.c=.lst))
 
+CONLYFLAGS = -std=gnu99 -Wstrict-prototypes
+CXXONLYFLAGS = -fno-exceptions -fno-rtti
 #  Compiler Options
-GCFLAGS = -std=gnu99  -mcpu=cortex-m0plus -mthumb -O$(OPTIMIZATION) -I. -Icore -Idrivers/inc
+GCFLAGS = -mcpu=cortex-m0plus -mthumb -O$(OPTIMIZATION) -I. -Icore -Idrivers/inc -Iadafruit
 # Warnings
-GCFLAGS += -Wno-strict-aliasing -Wstrict-prototypes -Wundef -Wall -Wextra -Wunreachable-code 
+GCFLAGS += -Wno-strict-aliasing -Wundef -Wall -Wextra -Wunreachable-code 
 # Optimizazions
 GCFLAGS +=  -fstrict-aliasing -fsingle-precision-constant -funsigned-char -funsigned-bitfields -fshort-enums -fno-builtin -ffunction-sections -fno-common -fdata-sections 
 # Debug stuff
 GCFLAGS += -Wa,-adhlns=.bin/$(<:.c=.lst) -g
 
-LDFLAGS = -T$(LDSCRIPT) -nostartfiles  -Wl,--gc-section 
+#LDFLAGS = -T$(LDSCRIPT) -nostartfiles -lstdc++_s -lg_s -lsupc++_s -lnosys
+#LDFLAGS  = -T$(LDSCRIPT) -nostartfiles  -Wl,--gc-section -lstdc++_s -lg_s -lsupc++_s -lnosys
+LDFLAGS  = -T$(LDSCRIPT) -nostartfiles  -Wl,--gc-section
 
 #  Compiler/Linker Paths
 GCC = arm-none-eabi-gcc
+GXX = arm-none-eabi-g++
 OBJCOPY = arm-none-eabi-objcopy
 REMOVE = rm -f
 SIZE = arm-none-eabi-size
@@ -48,13 +55,13 @@ firmware.bin: .bin/$(PROJECT).elf Makefile
 
 .bin/$(PROJECT).elf: $(OBJECTS) Makefile
 	@echo -e "  \033[1;34mLD \033[0m (\033[1;33m$(OBJECTS)\033[0m) -> $(PROJECT).elf"
-	@$(GCC) -o .bin/$(PROJECT).elf $(OBJECTS) $(GCFLAGS) $(LDFLAGS) 
+	@$(GXX) -o .bin/$(PROJECT).elf $(OBJECTS) $(GCFLAGS) $(LDFLAGS) 
 
 stats: .bin/$(PROJECT).elf 
 	@$(SIZE) .bin/$(PROJECT).elf
 
 clean:
-	@echo "  \033[1;34mCleanup\033[0m $<"
+	@echo -e "  \033[1;34mCleanup\033[0m $<"
 	@$(REMOVE) $(OBJECTS)
 	@$(REMOVE) $(DEPS)
 	@$(REMOVE) $(LSTFILES)
@@ -69,8 +76,17 @@ clean:
 
 .bin/%.o: %.c Makefile 
 	@echo -e "  \033[1;34mGCC\033[0m $<"
-	@$(GCC) $(GCFLAGS) -o $@ -c $<
-	@$(GCC) $(GCFLAGS) -MM $< > $*.d.tmp
+	@$(GCC) $(GCFLAGS) $(CONLYFLAGS) -o $@ -c $<
+	@$(GCC) $(GCFLAGS) $(CONLYFLAGS) -MM $< > $*.d.tmp
+	@sed -e 's|.*:|.bin/$*.o:|' < $*.d.tmp > .bin/$*.d
+	@sed -e 's/.*://' -e 's/\\$$//' < $*.d.tmp | fmt -1 | \
+		sed -e 's/^ *//' -e 's/$$/:/' >> .bin/$*.d
+	@rm -f $*.d.tmp
+
+.bin/%.o: %.cpp Makefile 
+	@echo -e "  \033[1;34mGXX\033[0m $<"
+	@$(GXX) $(GCFLAGS) $(CXXONLYFLAGS) -o $@ -c $<
+	@$(GXX) $(GCFLAGS) $(CXXONLYFLAGS) -MM $< > $*.d.tmp
 	@sed -e 's|.*:|.bin/$*.o:|' < $*.d.tmp > .bin/$*.d
 	@sed -e 's/.*://' -e 's/\\$$//' < $*.d.tmp | fmt -1 | \
 		sed -e 's/^ *//' -e 's/$$/:/' >> .bin/$*.d

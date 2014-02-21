@@ -1,5 +1,7 @@
 #include "main.h"
 #include "lcd3310.h"
+#include "adafruit/Adafruit_GFX.h"
+#include "adafruit/Adafruit_PCD8544.h"
 
 #define LED1 14
 
@@ -33,59 +35,37 @@ D/C pro LCD   je Pin 10 PIO0_16                 PIO0_16
 Reset pro LCD je Pin 8  PIO0_11(Open Drain)     PIO0_11   
 */
 
-void gpio_pin(int value, uint32_t mask) {
-    if (value)
-	LPC_GPIO_PORT->SET0 = mask;
-    else
-	LPC_GPIO_PORT->CLR0 = mask;
-}
 
 void led(int value) {
-    gpio_pin(value, 1<<LED1);
+  //    gpio_pin(value, 1 << LED1);
 }
 
-void lcd_pin_clock(int value) {
-    gpio_pin(value, 1<<3);
-}
 
-void lcd_pin_data(int value) {
-    gpio_pin(value, 1<<17);
-}
-
-void lcd_pin_datanotcmd(int value) {
-    gpio_pin(value, 1<<16);
-}
-
-void lcd_pin_enab(int value) {
-    gpio_pin(value, 1<<10);
-}
-
-void lcd_pin_reset(int value) {
-    gpio_pin(value, 1<<11);
-}
-
+extern "C" {
 extern void SwitchMatrix_Init(void);
+}
+
+class Lcd : Adafruit_GFX {
+};
+
+// !!
+// http://elegantinvention.com/blog/information/smaller-binary-size-with-c-on-baremetal-g/
+extern "C" void __cxa_pure_virtual() { while(1); }
 
 int main(void ) {
         SysTick_Config(SystemCoreClock / 1000);
 
 	SwitchMatrix_Init();
-	LPC_GPIO_PORT->DIR0 |= (1<<LED1) |
-	    // LCD pins
-	    (1<<3) |
-	    (1<<10) |
-	    (1<<11) |
-	    (1<<16) |
-	    (1<<17);
+	LPC_GPIO_PORT->DIR0 |= (1<<LED1);
 
-        lcd_init();
-        lcd_wbyte(42);
+	Adafruit_PCD8544 display(3, 17, 16, 10, 11);
+
+	display.begin();
 	while (1)
 	{
-                led(1);
-		delay_ms(1000);
-                led(0);
-		delay_ms(1000);
+	  display.fillCircle(display.width()/2, display.height()/2, 10, BLACK);
+	  display.display();
+	  delay_ms(1000);
 	}
 
 }
