@@ -16,8 +16,10 @@
 
 volatile uint32_t msTicks = 0;
 
+extern "C" {
 void SysTick_Handler(void) {
 	msTicks++;
+}
 }
 
 void delay_ms(uint32_t ms) {
@@ -59,13 +61,13 @@ int main(void ) {
 	SwitchMatrix_Init();
 	LPC_GPIO_PORT->DIR0 |= (1<<LED1);
 
-	// Adafruit_PCD8544 display(3, 17, 16, 10, 11);
+	Adafruit_PCD8544 display(3, 17, 16, 10, 11);
 
-	// display.begin();
+	display.begin();
 	while (1)
 	{
-	  //display.fillCircle(display.width()/2, display.height()/2, 10, BLACK);
-	  //display.display();
+	  // display.fillCircle(display.width()/2, display.height()/2, 10, BLACK);
+	  display.display();
 	  led(0);
 	  delay_ms(1000);
 	  led(1);

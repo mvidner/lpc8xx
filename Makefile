@@ -10,7 +10,7 @@ LDSCRIPT=core/$(MCU).ld
 
 
 #SRC=$(wildcard core/*.c) $(wildcard *.c *.cpp) $(wildcard adafruit/*.c adafruit/*.cpp)
-SRC=$(wildcard core/*.c) main.cpp WProgram.cpp swm.c
+SRC=$(wildcard core/*.c) main.cpp WProgram.cpp swm.c $(wildcard adafruit/*.c adafruit/*.cpp)
 CSRC=$(patsubst %.cpp,%.c,$(SRC))
 #$(info $(CSRC))
 
