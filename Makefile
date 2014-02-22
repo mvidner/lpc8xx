@@ -9,9 +9,10 @@ PROJECT=template
 LDSCRIPT=core/$(MCU).ld
 
 
-SRC=$(wildcard core/*.c) $(wildcard *.c *.cpp) $(wildcard adafruit/*.c adafruit/*.cpp)
+#SRC=$(wildcard core/*.c) $(wildcard *.c *.cpp) $(wildcard adafruit/*.c adafruit/*.cpp)
+SRC=$(wildcard core/*.c) main.cpp WProgram.cpp swm.c
 CSRC=$(patsubst %.cpp,%.c,$(SRC))
-$(info $(CSRC))
+#$(info $(CSRC))
 
 OBJECTS=$(patsubst %,.bin/%,$(CSRC:.c=.o))
 DEPS=$(patsubst %,.bin/%,$(CSRC:.c=.d))

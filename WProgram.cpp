@@ -2,14 +2,6 @@
 #include "main.h"
 #include "LPC8xx.h"
 
-void *memset(void *s, int c, uint32_t n) {
-  uint8_t * p = (uint8_t *) s;
-  while (n--) {
-    *p++ = c;
-  }
-  return s;
-}
-
 void pinMode(int pin, mode m) {
   if (m == OUTPUT)
     LPC_GPIO_PORT->DIR0 |=  (1 << pin);
@@ -17,15 +9,8 @@ void pinMode(int pin, mode m) {
     LPC_GPIO_PORT->DIR0 &= ~(1 << pin);
 }
 
-void gpio_pin(int value, uint32_t mask) {
-    if (value)
-	LPC_GPIO_PORT->SET0 = mask;
-    else
-	LPC_GPIO_PORT->CLR0 = mask;
-}
-
 void digitalWrite(int pin, int value) {
-  gpio_pin(value, 1UL << pin);
+  LPC_GPIO_PORT->B0[pin] = value;
 }
 
 void _delay_ms(int ms) {
@@ -33,7 +18,7 @@ void _delay_ms(int ms) {
 }
 
 uint8_t * portOutputRegister(int port) {
-  return (uint8_t *)(0xA000000 + port);
+  return (uint8_t *)(0xA0000000UL + port);
 }
 
 int digitalPinToPort(int pin) {

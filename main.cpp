@@ -66,9 +66,9 @@ int main(void ) {
 	{
 	  //display.fillCircle(display.width()/2, display.height()/2, 10, BLACK);
 	  //display.display();
-	  led(1);
-	  delay_ms(1000);
 	  led(0);
+	  delay_ms(1000);
+	  led(1);
 	  delay_ms(1000);
 	}
 
