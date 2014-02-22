@@ -1,5 +1,4 @@
 #include "main.h"
-#include "lcd3310.h"
 #include "adafruit/Adafruit_GFX.h"
 #include "adafruit/Adafruit_PCD8544.h"
 
@@ -38,15 +37,17 @@ Reset pro LCD je Pin 8  PIO0_11(Open Drain)     PIO0_11
 
 void led(int value) {
   //    gpio_pin(value, 1 << LED1);
+  //  LPC_GPIO_PORT->B0[LED1] = value;
+  if (value)
+    LPC_GPIO_PORT->SET0 = 1 << LED1;
+  else
+    LPC_GPIO_PORT->CLR0 = 1 << LED1;
 }
 
 
 extern "C" {
 extern void SwitchMatrix_Init(void);
 }
-
-class Lcd : Adafruit_GFX {
-};
 
 // !!
 // http://elegantinvention.com/blog/information/smaller-binary-size-with-c-on-baremetal-g/
@@ -58,13 +59,16 @@ int main(void ) {
 	SwitchMatrix_Init();
 	LPC_GPIO_PORT->DIR0 |= (1<<LED1);
 
-	Adafruit_PCD8544 display(3, 17, 16, 10, 11);
+	// Adafruit_PCD8544 display(3, 17, 16, 10, 11);
 
-	display.begin();
+	// display.begin();
 	while (1)
 	{
-	  display.fillCircle(display.width()/2, display.height()/2, 10, BLACK);
-	  display.display();
+	  //display.fillCircle(display.width()/2, display.height()/2, 10, BLACK);
+	  //display.display();
+	  led(1);
+	  delay_ms(1000);
+	  led(0);
 	  delay_ms(1000);
 	}
 
