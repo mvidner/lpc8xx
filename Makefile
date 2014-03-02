@@ -10,8 +10,8 @@ LDSCRIPT=core/$(MCU).ld
 
 
 #SRC=$(wildcard core/*.c) $(wildcard *.c *.cpp) $(wildcard adafruit/*.c adafruit/*.cpp)
-SRC=$(wildcard core/*.c) main.cpp WProgram.cpp swm.c $(wildcard adafruit/*.c adafruit/*.cpp)
-CSRC=$(patsubst %.cpp,%.c,$(SRC))
+SRC=$(wildcard core/*.c) main.cpp WProgram.cpp swm.c src/conways_life.cc src/random.cc $(wildcard adafruit/*.c adafruit/*.cpp)
+CSRC=$(patsubst %.cc,%.c,$(patsubst %.cpp,%.c,$(SRC)))
 #$(info $(CSRC))
 
 OBJECTS=$(patsubst %,.bin/%,$(CSRC:.c=.o))
@@ -48,8 +48,8 @@ all: .bin .bin/core firmware.bin stats
 .bin:
 	mkdir .bin
 
-.bin/core:
-	mkdir .bin/core
+.bin/core .bin/adafruit .bin/src:
+	mkdir $^
 
 firmware.bin: .bin/$(PROJECT).elf Makefile
 	@$(OBJCOPY) -R .stack -O binary .bin/$(PROJECT).elf firmware.bin
@@ -85,6 +85,15 @@ clean:
 	@rm -f $*.d.tmp
 
 .bin/%.o: %.cpp Makefile 
+	@echo -e "  \033[1;34mGXX\033[0m $<"
+	@$(GXX) $(GCFLAGS) $(CXXONLYFLAGS) -o $@ -c $<
+	@$(GXX) $(GCFLAGS) $(CXXONLYFLAGS) -MM $< > $*.d.tmp
+	@sed -e 's|.*:|.bin/$*.o:|' < $*.d.tmp > .bin/$*.d
+	@sed -e 's/.*://' -e 's/\\$$//' < $*.d.tmp | fmt -1 | \
+		sed -e 's/^ *//' -e 's/$$/:/' >> .bin/$*.d
+	@rm -f $*.d.tmp
+
+.bin/%.o: %.cc Makefile 
 	@echo -e "  \033[1;34mGXX\033[0m $<"
 	@$(GXX) $(GCFLAGS) $(CXXONLYFLAGS) -o $@ -c $<
 	@$(GXX) $(GCFLAGS) $(CXXONLYFLAGS) -MM $< > $*.d.tmp

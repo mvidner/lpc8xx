@@ -1,18 +1,10 @@
 #include "main.h"
 #include "adafruit/Adafruit_GFX.h"
 #include "adafruit/Adafruit_PCD8544.h"
+#include "src/conways_life.h"
+#include "src/random.h"
 
 #define LED1 14
-
-/*
- * 	datasheet: http://www.nxp.com/documents/data_sheet/LPC81XM.pdf
- *  user manual: http://www.nxp.com/documents/user_manual/UM10601.pdf
- *  swtich matrix tool: http://www.lpcware.com/content/nxpfile/nxp-switch-matrix-tool-lpc800 (for pin configuration)
- *
- *
- *  ISP: When pin PIO0_1 is pulled LOW on reset, the part enters ISP mode and the ISP command handler starts up. 
- *       In ISP mode, pin PIO0_0 is connected to function U0_RXD and pin PIO0_4 is connected to function U0_TXD on the USART0 block.
- */
 
 volatile uint32_t msTicks = 0;
 
@@ -55,24 +47,57 @@ extern void SwitchMatrix_Init(void);
 // http://elegantinvention.com/blog/information/smaller-binary-size-with-c-on-baremetal-g/
 extern "C" void __cxa_pure_virtual() { while(1); }
 
+double live_p = 0.2;
+
+void random_setup(ConwaysLife &cl) {
+  int LIVE_MAX = int (live_p * MY_RAND_MAX);
+  for (unsigned y = 0; y < cl.size_y(); ++y) {
+    for (unsigned x = 0; x < cl.size_x(); ++x) {
+      cl.set(x, y, ConwaysLife::State(myrand() <= LIVE_MAX));
+    }
+  }
+}
+
+void showit(Adafruit_PCD8544& d, const ConwaysLife& cl) {
+  for (unsigned y = 0; y < cl.size_y(); ++y) {
+    for (unsigned x = 0; x < cl.size_x(); ++x) {
+      d.drawPixel(x, y, cl.get(x, y));
+    }
+  }
+  d.display();
+}
+
 int main(void ) {
-        SysTick_Config(SystemCoreClock / 1000);
+  SysTick_Config(SystemCoreClock / 1000);
 
-	SwitchMatrix_Init();
-	LPC_GPIO_PORT->DIR0 |= (1<<LED1);
+  SwitchMatrix_Init();
+  LPC_GPIO_PORT->DIR0 |= (1<<LED1);
 
-	Adafruit_PCD8544 display(3, 17, 16, 10, 11);
+  Adafruit_PCD8544 display(3, 17, 16, 10, 11);
+  display.begin();
 
-	display.begin();
-	while (1)
-	{
-	  // display.fillCircle(display.width()/2, display.height()/2, 10, BLACK);
-	  display.display();
-	  led(0);
-	  delay_ms(1000);
-	  led(1);
-	  delay_ms(1000);
-	}
+  ConwaysLife cl;
 
+  mysrand(704);
+
+  while (1) {
+    // display.fillCircle(display.width()/2, display.height()/2, 10, BLACK);
+    random_setup(cl);
+
+    int generations = 0;
+    int period;
+    do {
+      delay_ms(1);
+      showit(display, cl);
+      cl.next();
+      ++generations;
+      period = cl.stabilized();
+    } while (period == 0);
+
+    led(1);
+    delay_ms(1000);
+    led(0);
+    delay_ms(1000);
+  }
 }
 

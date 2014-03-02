@@ -91,7 +91,7 @@ void parse_options(int argc, char ** argv) {
   }
 }
 
-int main(int argc, char ** argv) {
+int old_main(int argc, char ** argv) {
   parse_options(argc, argv);
   mysrand(seed);
 
