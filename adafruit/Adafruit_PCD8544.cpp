@@ -77,14 +77,17 @@ static uint8_t xUpdateMin, xUpdateMax, yUpdateMin, yUpdateMax;
 
 
 
-static void updateBoundingBox(uint8_t xmin, uint8_t ymin, uint8_t xmax, uint8_t ymax) {
 #ifdef enablePartialUpdate
+static void updateBoundingBox(uint8_t xmin, uint8_t ymin, uint8_t xmax, uint8_t ymax) {
   if (xmin < xUpdateMin) xUpdateMin = xmin;
   if (xmax > xUpdateMax) xUpdateMax = xmax;
   if (ymin < yUpdateMin) yUpdateMin = ymin;
   if (ymax > yUpdateMax) yUpdateMax = ymax;
-#endif
 }
+#else
+static void updateBoundingBox(uint8_t, uint8_t, uint8_t, uint8_t) {
+}
+#endif
 
 Adafruit_PCD8544::Adafruit_PCD8544(int8_t SCLK, int8_t DIN, int8_t DC,
     int8_t CS, int8_t RST) : Adafruit_GFX(LCDWIDTH, LCDHEIGHT) {
