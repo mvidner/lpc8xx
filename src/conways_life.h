@@ -4,7 +4,8 @@
 class ConwaysLife {
   static const unsigned SIZE_X = 84;
   static const unsigned SIZE_Y = 48;
-  static const unsigned NBOARDS = 7;
+  static const unsigned MAX_PERIOD = 2;
+  static const unsigned NBOARDS = MAX_PERIOD + 1;
 public:
   enum State { DEAD = 0, ALIVE = 1 };
 
@@ -26,7 +27,7 @@ public:
   void set_board(unsigned x, unsigned y, State s, unsigned board_idx);
 
 private:
-  typedef State Board[SIZE_X * SIZE_Y];
+  typedef unsigned char Board[SIZE_X * SIZE_Y / 8];
   Board boards[NBOARDS];
   unsigned current_board;
 };
