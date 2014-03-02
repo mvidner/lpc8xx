@@ -15,15 +15,18 @@ ConwaysLife::State ConwaysLife::get(int x, int y) const {
   const Board * board = &boards[current_board];
   x = (x + SIZE_X) % SIZE_X;
   y = (y + SIZE_Y) % SIZE_Y;
-  unsigned char b = (*board)[SIZE_X * y + x / 8];
-  unsigned int mask = 1 << (x % 8);
-  return State(b & mask);
+  unsigned int byte_num = SIZE_X * y + x;
+  unsigned char b = (*board)[byte_num / 8];
+  unsigned int mask = 1 << (byte_num % 8);
+  State ret = State((b & mask)? 1 : 0);
+  return ret;
 }
 
 void ConwaysLife::set_board(unsigned x, unsigned y, ConwaysLife::State s, unsigned board_idx) {
   if (x < SIZE_X && y < SIZE_Y) {
-    unsigned char mask = 1 << (x % 8);
-    unsigned char * dest = &boards[board_idx][SIZE_X * y + x / 8];
+    unsigned int byte_num = SIZE_X * y + x;
+    unsigned int mask = 1 << (byte_num % 8);
+    unsigned char * dest = &boards[board_idx][byte_num / 8];
     if (s) {
       *dest |= mask;
     }

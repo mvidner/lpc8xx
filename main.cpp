@@ -67,6 +67,8 @@ void showit(Adafruit_PCD8544& d, const ConwaysLife& cl) {
   d.display();
 }
 
+ConwaysLife cl;
+
 int main(void ) {
   SysTick_Config(SystemCoreClock / 1000);
 
@@ -76,18 +78,13 @@ int main(void ) {
   Adafruit_PCD8544 display(3, 17, 16, 10, 11);
   display.begin();
 
-  ConwaysLife cl;
-
   mysrand(704);
-
   while (1) {
-    // display.fillCircle(display.width()/2, display.height()/2, 10, BLACK);
     random_setup(cl);
 
     int generations = 0;
-    int period;
+    int period = 0;
     do {
-      delay_ms(1);
       showit(display, cl);
       cl.next();
       ++generations;

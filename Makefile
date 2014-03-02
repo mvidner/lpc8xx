@@ -1,5 +1,5 @@
 PATH:=$(HOME)/gcc-arm/bin:$(PATH)
-OPTIMIZATION = s
+OPTIMIZATION = 3
 
 # lpc810 / lpc811 / lpc812
 MCU=lpc812
@@ -10,7 +10,7 @@ LDSCRIPT=core/$(MCU).ld
 
 
 #SRC=$(wildcard core/*.c) $(wildcard *.c *.cpp) $(wildcard adafruit/*.c adafruit/*.cpp)
-SRC=$(wildcard core/*.c) main.cpp WProgram.cpp swm.c src/conways_life.cc src/random.cc $(wildcard adafruit/*.c adafruit/*.cpp)
+SRC=$(wildcard core/*.c) main.cpp WProgram.cpp swm.c src/conways_life.cc src/random.cc $(wildcard adafruit/*.cpp)
 CSRC=$(patsubst %.cc,%.c,$(patsubst %.cpp,%.c,$(SRC)))
 #$(info $(CSRC))
 
@@ -49,7 +49,7 @@ all: .bin .bin/core firmware.bin stats
 	mkdir .bin
 
 .bin/core .bin/adafruit .bin/src:
-	mkdir $^
+	mkdir $@
 
 firmware.bin: .bin/$(PROJECT).elf Makefile
 	@$(OBJCOPY) -R .stack -O binary .bin/$(PROJECT).elf firmware.bin
